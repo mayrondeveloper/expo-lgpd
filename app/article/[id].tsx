@@ -21,7 +21,7 @@ A LGPD se aplica a:
 3. Tratamento com finalidade de oferta de bens/serviços no Brasil`,
     category: 'Introdução',
     date: '15/05/2023',
-    author: 'Equipe LGPD Explorer',
+    author: 'Equipe LGPD',
     isFavorite: true
   },
   2: {
@@ -43,7 +43,7 @@ A LGPD se aplica a:
 Estes direitos podem ser exercidos mediante requisição ao controlador dos dados.`,
     category: 'Direitos',
     date: '22/05/2023',
-    author: 'Equipe LGPD Explorer',
+    author: 'Equipe LGPD',
     isFavorite: false
   }
 };

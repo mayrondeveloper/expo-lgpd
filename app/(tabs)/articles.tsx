@@ -1,7 +1,7 @@
 // app/(tabs)/articles.tsx
 import { useState } from 'react';
 import { FlatList, View, Text, StyleSheet } from 'react-native';
-import { mockArticles } from '@/data/articles';
+import mockArticles from '@/data/articles';
 import ArticleCard from '@/components/ArticleCard';
 import SearchBar from '@/components/SearchBar';
 

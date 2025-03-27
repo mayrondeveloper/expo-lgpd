@@ -22,11 +22,15 @@ export default function ArticleCard({ article }) {
 }
 
 const styles = StyleSheet.create({
-  card: {
-    backgroundColor: 'white',
-    borderRadius: 8,
-    padding: 16,
-    marginBottom: 12,
-    elevation: 2,
-  },
+    header: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    card: {
+        backgroundColor: 'white',
+        borderRadius: 8,
+        padding: 16,
+        marginBottom: 12,
+        elevation: 2,
+    },
 });

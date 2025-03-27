@@ -66,6 +66,7 @@ export default function RootLayout() {
                     presentation: 'modal'
                   }}
                 />
+                <Stack.Screen name="categories/[name]/index" options={{ headerShown: false }} />
               </Stack>
             </SQLiteProvider>
           </Suspense>

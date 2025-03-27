@@ -1,18 +1,8 @@
 import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
 import { Link } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+import mockArticles from '@/data/articles';
 
-const mockArticles = [
-  {
-    id: 1,
-    title: 'O que é a LGPD?',
-    summary: 'Lei Geral de Proteção de Dados Pessoais no Brasil',
-    category: 'Introdução',
-    date: '15/05/2023',
-    readingTime: '5 min',
-    isFavorite: true
-  },
-];
 
 export default function ArticlesScreen() {
   return (

@@ -1,6 +1,6 @@
 // components/FeaturedArticles.tsx
 import { View, Text, FlatList } from 'react-native';
-import { mockArticles } from '@/data/articles';
+import mockArticles from '@/data/articles';
 import ArticleCard from '@/components/ArticleCard';
 
 interface FeaturedArticlesProps {

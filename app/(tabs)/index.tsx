@@ -3,6 +3,8 @@ import { View, Text, ScrollView, TouchableOpacity, StyleSheet, FlatList, Animate
 import { Link } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import {useRef} from 'react';
+import { getCategoryColor } from '@/utils/categoryStyles';
+
 
 const mockArticles = [
   {
@@ -54,52 +56,7 @@ const getCategoryIcon = (name: string) => {
   }
 };
 
-export const getCategoryColor = (name: string) => {
-  switch(name) {
-    case 'Introdução':
-      return {
-        icon: 'star',
-        iconColor: '#f6ad55', // Amêndoa
-        bgColor: '#fffaf0',   // Fundo claro
-        textColor: '#dd6b20'  // Texto escuro
-      };
-    case 'Direitos':
-      return {
-        icon: 'gavel',
-        iconColor: '#68d391', // Verde menta
-        bgColor: '#f0fff4',
-        textColor: '#38a169'
-      };
-    case 'Obrigações':
-      return {
-        icon: 'shield',
-        iconColor: '#63b3ed', // Azul céu
-        bgColor: '#ebf8ff',
-        textColor: '#3182ce'
-      };
-    case 'Sanções':
-      return {
-        icon: 'warning',
-        iconColor: '#fc8181', // Vermelho claro
-        bgColor: '#fff5f5',
-        textColor: '#e53e3e'
-      };
-    case 'Jurisprudência':
-      return {
-        icon: 'bookmarks',
-        iconColor: '#9f7aea', // Roxo
-        bgColor: '#faf5ff',
-        textColor: '#805ad5'
-      };
-    default:
-      return {
-        icon: 'folder',
-        iconColor: '#a0aec0', // Cinza
-        bgColor: '#edf2f7',
-        textColor: '#4a5568'
-      };
-  }
-};
+
 
 export default function HomeScreen() {
     const scaleAnim = useRef(new Animated.Value(1)).current;
@@ -120,7 +77,7 @@ export default function HomeScreen() {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>LGPD Explorer</Text>
+        <Text style={styles.title}>Lei LGPD - Digital</Text>
         <Text style={styles.subtitle}>Tudo sobre proteção de dados no Brasil</Text>
       </View>
 
@@ -177,7 +134,7 @@ export default function HomeScreen() {
          renderItem={({ item }) => {
            const colors = getCategoryColor(item.name);
            return (
-             <Link href={`/category/${item.name}`} asChild>
+               <Link href={`/categories/${encodeURIComponent(item.name)}`} asChild>
                <TouchableOpacity
                 onPressIn={handlePressIn}
                 onPressOut={handlePressOut}

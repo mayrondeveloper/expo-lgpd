@@ -1,7 +1,8 @@
 // app/index.tsx
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, FlatList } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, FlatList, Animated  } from 'react-native';
 import { Link } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
+import {useRef} from 'react';
 
 const mockArticles = [
   {
@@ -53,7 +54,69 @@ const getCategoryIcon = (name: string) => {
   }
 };
 
+export const getCategoryColor = (name: string) => {
+  switch(name) {
+    case 'Introdução':
+      return {
+        icon: 'star',
+        iconColor: '#f6ad55', // Amêndoa
+        bgColor: '#fffaf0',   // Fundo claro
+        textColor: '#dd6b20'  // Texto escuro
+      };
+    case 'Direitos':
+      return {
+        icon: 'gavel',
+        iconColor: '#68d391', // Verde menta
+        bgColor: '#f0fff4',
+        textColor: '#38a169'
+      };
+    case 'Obrigações':
+      return {
+        icon: 'shield',
+        iconColor: '#63b3ed', // Azul céu
+        bgColor: '#ebf8ff',
+        textColor: '#3182ce'
+      };
+    case 'Sanções':
+      return {
+        icon: 'warning',
+        iconColor: '#fc8181', // Vermelho claro
+        bgColor: '#fff5f5',
+        textColor: '#e53e3e'
+      };
+    case 'Jurisprudência':
+      return {
+        icon: 'bookmarks',
+        iconColor: '#9f7aea', // Roxo
+        bgColor: '#faf5ff',
+        textColor: '#805ad5'
+      };
+    default:
+      return {
+        icon: 'folder',
+        iconColor: '#a0aec0', // Cinza
+        bgColor: '#edf2f7',
+        textColor: '#4a5568'
+      };
+  }
+};
+
 export default function HomeScreen() {
+    const scaleAnim = useRef(new Animated.Value(1)).current;
+
+    const handlePressIn = () => {
+      Animated.spring(scaleAnim, {
+        toValue: 0.98,
+        useNativeDriver: true,
+      }).start();
+    };
+
+    const handlePressOut = () => {
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        useNativeDriver: true,
+      }).start();
+    };
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -108,35 +171,49 @@ export default function HomeScreen() {
           <Text style={styles.sectionTitle}>Explore por Categorias</Text>
         </View>
 
-        <FlatList
-          data={mockCategories}
-          scrollEnabled={false}
-          renderItem={({ item }) => (
-            <Link href={`/category/${item.name}`} asChild>
-              <TouchableOpacity style={styles.categoryCard}>
-                <View style={styles.categoryIconContainer}>
-                  <MaterialIcons
-                    name={getCategoryIcon(item.name)}
-                    size={20}
-                    color="#3182ce"
-                    style={styles.categoryIcon}
-                  />
-                </View>
-                <View style={styles.categoryTextContainer}>
-                  <Text style={styles.categoryName}>{item.name}</Text>
-                  <Text style={styles.categoryCount}>{item.count} artigos disponíveis</Text>
-                </View>
-                <MaterialIcons
-                  name="chevron-right"
-                  size={24}
-                  color="#a0aec0"
-                />
-              </TouchableOpacity>
-            </Link>
-          )}
-          keyExtractor={(item) => item.name}
-          contentContainerStyle={styles.categoriesContainer}
-        />
+       <FlatList
+         data={mockCategories}
+         scrollEnabled={false}
+         renderItem={({ item }) => {
+           const colors = getCategoryColor(item.name);
+           return (
+             <Link href={`/category/${item.name}`} asChild>
+               <TouchableOpacity
+                onPressIn={handlePressIn}
+                onPressOut={handlePressOut}
+                activeOpacity={0.8}
+                style={{...styles.categoryCard,
+                  backgroundColor: colors.bgColor,
+                  borderLeftWidth: 4,
+                  borderLeftColor: colors.iconColor
+                }}>
+                 <View style={{...styles.categoryIconContainer,
+                   backgroundColor: `${colors.iconColor}20` }}>
+                   <MaterialIcons
+                     name={colors.icon}
+                     size={20}
+                     color={colors.iconColor}
+                   />
+                 </View>
+                 <View style={styles.categoryTextContainer}>
+                   <Text style={{...styles.categoryName, color: colors.textColor }}>
+                     {item.name}
+                   </Text>
+                   <Text style={styles.categoryCount}>
+                     {item.count} artigos disponíveis
+                   </Text>
+                 </View>
+                 <MaterialIcons
+                   name="chevron-right"
+                   size={24}
+                   color={colors.iconColor}
+                 />
+               </TouchableOpacity>
+             </Link>
+           );
+         }}
+         keyExtractor={(item) => item.name}
+       />
       </View>
 
       <View style={styles.newsletterCard}>
@@ -271,46 +348,40 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       marginBottom: 12,
     },
-    categoriesContainer: {
-      paddingBottom: 8,
-    },
     categoryCard: {
-      flexDirection: 'row',
-      alignItems: 'center',
-      backgroundColor: 'white',
-      borderRadius: 12,
-      padding: 16,
-      marginBottom: 12,
-      shadowColor: '#000',
-      shadowOffset: { width: 0, height: 1 },
-      shadowOpacity: 0.05,
-      shadowRadius: 3,
-      elevation: 2,
-    },
-    categoryIconContainer: {
-      backgroundColor: '#ebf5ff',
-      borderRadius: 8,
-      width: 40,
-      height: 40,
-      justifyContent: 'center',
-      alignItems: 'center',
-      marginRight: 16,
-    },
+       flexDirection: 'row',
+       alignItems: 'center',
+       borderRadius: 12,
+       padding: 16,
+       marginBottom: 12,
+       shadowColor: '#000',
+       shadowOffset: { width: 0, height: 1 },
+       shadowOpacity: 0.1,
+       shadowRadius: 3,
+       elevation: 2,
+     },
+     categoryIconContainer: {
+       borderRadius: 8,
+       width: 40,
+       height: 40,
+       justifyContent: 'center',
+       alignItems: 'center',
+       marginRight: 16,
+     },
+     categoryTextContainer: {
+       flex: 1,
+     },
+     categoryName: {
+       fontSize: 16,
+       fontWeight: '600',
+       marginBottom: 4,
+     },
+     categoryCount: {
+       fontSize: 13,
+       color: '#718096',
+     },
     categoryIcon: {
       opacity: 0.8,
-    },
-    categoryTextContainer: {
-      flex: 1,
-    },
-    categoryName: {
-      fontSize: 16,
-      fontWeight: '600',
-      color: '#2d3748',
-      marginBottom: 4,
-    },
-    categoryCount: {
-      fontSize: 13,
-      color: '#718096',
     },
     seeAll: {
       color: '#3182ce',

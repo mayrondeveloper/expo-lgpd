@@ -1,65 +1,51 @@
-// app/index.tsx
-import { View, Text, ScrollView, TouchableOpacity, StyleSheet, FlatList, Animated  } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, StyleSheet, FlatList, Animated } from 'react-native';
 import { Link } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
-import {useRef} from 'react';
-import { getCategoryColor } from '@/utils/categoryStyles';
-
-
-const mockArticles = [
-  {
-    id: 1,
-    title: 'O que é a LGPD?',
-    summary: 'Entenda a Lei Geral de Proteção de Dados do Brasil',
-    category: 'Introdução',
-    isFavorite: true
-  },
-  {
-    id: 2,
-    title: 'Direitos dos Titulares',
-    summary: 'Conheça os 10 direitos garantidos pela LGPD',
-    category: 'Direitos',
-    isFavorite: false
-  },
-  {
-    id: 3,
-    title: 'Sanções Administrativas',
-    summary: 'Multas e penalidades por descumprimento da lei',
-    category: 'Sanções',
-    isFavorite: true
-  },
-  {
-    id: 4,
-    title: 'Dados Sensíveis',
-    summary: 'Regras especiais para categorias específicas de dados',
-    category: 'Conceitos',
-    isFavorite: false
-  },
-];
-
-const mockCategories = [
-  { name: 'Introdução', count: 5 },
-  { name: 'Direitos', count: 8 },
-  { name: 'Obrigações', count: 6 },
-  { name: 'Sanções', count: 4 },
-  { name: 'Jurisprudência', count: 12 },
-];
-
-const getCategoryIcon = (name: string) => {
-  switch(name) {
-    case 'Introdução': return 'start';
-    case 'Direitos': return 'gavel';
-    case 'Obrigações': return 'shield';
-    case 'Sanções': return 'warning';
-    case 'Jurisprudência': return 'bookmarks';
-    default: return 'folder';
-  }
-};
-
-
+import { useState, useEffect, useRef } from 'react';
+import { getCategoryColor, getCategoryIcon } from '@/utils/categoryStyles';
+import { useSQLiteContext } from 'expo-sqlite';
+import { DatabaseService } from '@/database/db';
 
 export default function HomeScreen() {
+    const db = useSQLiteContext();
+    const [articles, setArticles] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(true);
     const scaleAnim = useRef(new Animated.Value(1)).current;
+
+    useEffect(() => {
+      async function loadData() {
+        try {
+          const existingArticles = await DatabaseService.getArticles(db);
+          if (existingArticles.length === 0) {
+            await DatabaseService.insertSampleData(db);
+          }
+
+          const loadedArticles = await DatabaseService.getArticles(db);
+          const loadedCategories = await DatabaseService.getCategories(db);
+
+          setArticles(loadedArticles);
+          setCategories(loadedCategories);
+        } catch (error) {
+          console.error("Erro ao carregar dados:", error);
+        } finally {
+          setLoading(false);
+        }
+      }
+
+      loadData();
+    }, []);
+
+    const handleToggleFavorite = async (id: number) => {
+      try {
+        await DatabaseService.toggleFavorite(db, id);
+        // Atualiza a lista de artigos após a mudança
+        const updatedArticles = await DatabaseService.getArticles(db);
+        setArticles(updatedArticles);
+      } catch (error) {
+        console.error("Erro ao atualizar favorito:", error);
+      }
+    };
 
     const handlePressIn = () => {
       Animated.spring(scaleAnim, {
@@ -74,6 +60,24 @@ export default function HomeScreen() {
         useNativeDriver: true,
       }).start();
     };
+
+    if (loading) {
+      return (
+        <View style={styles.container}>
+          <Text>Carregando...</Text>
+        </View>
+      );
+    }
+
+    const getCategoryCounts = () => {
+      return categories.map(category => ({
+        name: category.name,
+        count: category.article_count
+      }));
+    };
+
+    const featuredArticles = articles.slice(0, 5);
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
@@ -100,27 +104,32 @@ export default function HomeScreen() {
 
         <FlatList
           horizontal
-          data={mockArticles}
+          data={featuredArticles}
           renderItem={({ item }) => (
-            <Link href={`/article/${item.id}`} asChild>
-              <TouchableOpacity style={styles.articleCard}>
-                <View style={styles.favoriteIcon}>
-                  <MaterialIcons
-                    name={item.isFavorite ? "favorite" : "favorite-outline"}
-                    size={20}
-                    color={item.isFavorite ? "#FF3B30" : "#ccc"}
-                  />
-                </View>
-                <Text style={styles.articleCategory}>{item.category}</Text>
-                <Text style={styles.articleTitle}>{item.title}</Text>
-                <Text style={styles.articleSummary}>{item.summary}</Text>
-              </TouchableOpacity>
-          </Link>
-        )}
-        keyExtractor={item => item.id.toString()}
-        showsHorizontalScrollIndicator={false}
-        contentContainerStyle={styles.articlesContainer}
-      />
+            <View style={styles.articleCardWrapper}>
+                          <Link href={`/article/${item.id}`} asChild>
+                            <TouchableOpacity style={styles.articleCard}>
+                              <Text style={styles.articleCategory}>{item.category}</Text>
+                              <Text style={styles.articleTitle}>{item.title}</Text>
+                              <Text style={styles.articleSummary}>{item.content.substring(0, 100)}...</Text>
+                            </TouchableOpacity>
+                          </Link>
+                          <TouchableOpacity
+                            style={styles.favoriteButton}
+                            onPress={() => handleToggleFavorite(item.id)}
+                          >
+                            <MaterialIcons
+                              name={item.isFavorite ? "bookmark" : "bookmark-outline"}
+                              size={24}
+                              color={item.isFavorite ? "#3182CE" : "#A0AEC0"}
+                            />
+                          </TouchableOpacity>
+                        </View>
+          )}
+          keyExtractor={item => item.id.toString()}
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.articlesContainer}
+        />
       </View>
 
       <View style={styles.section}>
@@ -128,57 +137,52 @@ export default function HomeScreen() {
           <Text style={styles.sectionTitle}>Explore por Categorias</Text>
         </View>
 
-       <FlatList
-         data={mockCategories}
-         scrollEnabled={false}
-         renderItem={({ item }) => {
-           const colors = getCategoryColor(item.name);
-           return (
-               <Link href={`/categories/${encodeURIComponent(item.name)}`} asChild>
-               <TouchableOpacity
-                onPressIn={handlePressIn}
-                onPressOut={handlePressOut}
-                activeOpacity={0.8}
-                style={{...styles.categoryCard,
-                  backgroundColor: colors.bgColor,
-                  borderLeftWidth: 4,
-                  borderLeftColor: colors.iconColor
-                }}>
-                 <View style={{...styles.categoryIconContainer,
-                   backgroundColor: `${colors.iconColor}20` }}>
-                   <MaterialIcons
-                     name={colors.icon}
-                     size={20}
-                     color={colors.iconColor}
-                   />
-                 </View>
-                 <View style={styles.categoryTextContainer}>
-                   <Text style={{...styles.categoryName, color: colors.textColor }}>
-                     {item.name}
-                   </Text>
-                   <Text style={styles.categoryCount}>
-                     {item.count} artigos disponíveis
-                   </Text>
-                 </View>
-                 <MaterialIcons
-                   name="chevron-right"
-                   size={24}
-                   color={colors.iconColor}
-                 />
-               </TouchableOpacity>
-             </Link>
-           );
-         }}
-         keyExtractor={(item) => item.name}
-       />
-      </View>
-
-      <View style={styles.newsletterCard}>
-        <Text style={styles.newsletterTitle}>Fique por dentro!</Text>
-        <Text style={styles.newsletterText}>Receba atualizações sobre LGPD diretamente no seu e-mail</Text>
-        <TouchableOpacity style={styles.newsletterButton}>
-          <Text style={styles.newsletterButtonText}>Assinar Newsletter</Text>
-        </TouchableOpacity>
+        <FlatList
+          data={getCategoryCounts()}
+          scrollEnabled={false}
+          renderItem={({ item }) => {
+            const colors = getCategoryColor(item.name);
+            return (
+              <Link href={`/categories/${encodeURIComponent(item.name)}`} asChild>
+                <TouchableOpacity
+                  onPressIn={handlePressIn}
+                  onPressOut={handlePressOut}
+                  activeOpacity={0.8}
+                  style={{
+                    ...styles.categoryCard,
+                    backgroundColor: colors.bgColor,
+                    borderLeftWidth: 4,
+                    borderLeftColor: colors.iconColor
+                  }}>
+                  <View style={{
+                    ...styles.categoryIconContainer,
+                    backgroundColor: `${colors.iconColor}20`
+                  }}>
+                    <MaterialIcons
+                      name={getCategoryIcon(item.name)}
+                      size={20}
+                      color={colors.iconColor}
+                    />
+                  </View>
+                  <View style={styles.categoryTextContainer}>
+                    <Text style={{ ...styles.categoryName, color: colors.textColor }}>
+                      {item.name}
+                    </Text>
+                    <Text style={styles.categoryCount}>
+                      {item.count} artigos disponíveis
+                    </Text>
+                  </View>
+                  <MaterialIcons
+                    name="chevron-right"
+                    size={24}
+                    color={colors.iconColor}
+                  />
+                </TouchableOpacity>
+              </Link>
+            );
+          }}
+          keyExtractor={(item) => item.name}
+        />
       </View>
     </ScrollView>
   );
@@ -344,5 +348,19 @@ const styles = StyleSheet.create({
       color: '#3182ce',
       fontWeight: '500',
       fontSize: 14,
+    },
+favoriteButton: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+    zIndex: 1,
+    backgroundColor: 'rgba(255, 255, 255, 0.9)',
+    borderRadius: 20,
+    padding: 4,
+  },
+   articleCardWrapper: {
+      position: 'relative',
+      width: 280,
+      marginRight: 16,
     },
 });

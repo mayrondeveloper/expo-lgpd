@@ -1,9 +1,22 @@
-import { View, Text } from 'react-native';
+// app/(tabs)/index.tsx
+import { useState } from 'react';
+import { View } from 'react-native';
+import SearchBar from '@/components/SearchBar';
+import SavedArticles from '@/components/SavedArticles';
 
 export default function Saved() {
-    return (
-      <View>
-        <Text>Artigo não encontrado</Text>
+  const [searchText, setSearchText] = useState('');
+
+  return (
+    <View style={{ flex: 1 }}>
+      <View style={{ padding: 16 }}>
+        <SearchBar
+          onSearch={(text) => setSearchText(text)}
+          onClear={() => setSearchText('')}
+        />
       </View>
-    );
+
+      <SavedArticles searchQuery={searchText} />
+    </View>
+  );
 }

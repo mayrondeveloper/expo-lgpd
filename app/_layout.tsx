@@ -9,6 +9,7 @@ import 'react-native-reanimated';
 import { SQLiteProvider, useSQLiteContext, type SQLiteDatabase } from 'expo-sqlite';
 import { useColorScheme } from '@/hooks/useColorScheme';
 import { View, Text } from 'react-native';
+import { DatabaseService } from '@/database/db'
 
 SplashScreen.preventAutoHideAsync();
 
@@ -28,41 +29,18 @@ export default function RootLayout() {
     return null;
   }
 
-  async function migrateDbIfNeeded(db: SQLiteDatabase) {
-    const DATABASE_VERSION = 1;
-    let { user_version: currentDbVersion } = await db.getFirstAsync<{ user_version: number }>(
-      'PRAGMA user_version'
-    );
-    if (currentDbVersion >= DATABASE_VERSION) {
-      return;
-    }
-    if (currentDbVersion === 0) {
-      await db.execAsync(`
-  PRAGMA journal_mode = 'wal';
-  CREATE TABLE todos (id INTEGER PRIMARY KEY NOT NULL, value TEXT NOT NULL, intValue INTEGER);
-  `);
-      await db.runAsync('INSERT INTO todos (value, intValue) VALUES (?, ?)', 'hello', 1);
-      await db.runAsync('INSERT INTO todos (value, intValue) VALUES (?, ?)', 'world', 2);
-      await db.runAsync('INSERT INTO todos (value, intValue) VALUES (?, ?)', 'Mayron', 3);
-      currentDbVersion = 1;
-    }
-    // if (currentDbVersion === 1) {
-    //   Add more migrations
-    // }
-    await db.execAsync(`PRAGMA user_version = ${DATABASE_VERSION}`);
-    console.log(db);
-  }
+
 
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
           <Suspense fallback={<>Aguarde...</>}>
-            <SQLiteProvider databaseName="lgpd.db" onInit={migrateDbIfNeeded}>
+            <SQLiteProvider databaseName="lgpd.db" onInit={DatabaseService.initializeDatabase}>
               <Stack>
                 <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
                 <Stack.Screen
                   name="article/[id]"
                   options={{
-                    title: 'Artigo',
+                    title: '',
                     presentation: 'modal'
                   }}
                 />

@@ -1,110 +1,110 @@
-// app/article/[id].tsx
+import { useLocalSearchParams } from 'expo-router';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
-import { Stack, useLocalSearchParams } from 'expo-router';
+import { useSQLiteContext } from 'expo-sqlite';
+import { useEffect, useState } from 'react';
+import { DatabaseService } from '@/database/db';
+import SaveButton from '@/components/saveButton';
 import { MaterialIcons } from '@expo/vector-icons';
+import { getCategoryColorForCard } from '@/utils/categoryStyles';
 
-const mockArticleDetails = {
-  1: {
-    title: 'O que é a LGPD?',
-    content: `A Lei Geral de Proteção de Dados Pessoais (LGPD), Lei nº 13.709/2018, é a legislação brasileira que regula as atividades de tratamento de dados pessoais.
-
-## Principais características:
-- Aplicável a qualquer operação de tratamento de dados
-- Inspirada no GDPR europeu
-- Entrou em vigor em setembro de 2020
-- Fiscalizada pela ANPD (Autoridade Nacional de Proteção de Dados)
-
-## Âmbito de aplicação:
-A LGPD se aplica a:
-1. Todo tratamento realizado no Brasil
-2. Dados coletados no Brasil
-3. Tratamento com finalidade de oferta de bens/serviços no Brasil`,
-    category: 'Introdução',
-    date: '15/05/2023',
-    author: 'Equipe LGPD',
-    isFavorite: true
-  },
-  2: {
-    title: 'Direitos dos Titulares',
-    content: `A LGPD estabelece dez direitos básicos para os titulares de dados pessoais.
-
-## Direitos garantidos:
-1. Confirmação da existência de tratamento
-2. Acesso aos dados
-3. Correção de dados incompletos ou inexatos
-4. Anonimização, bloqueio ou eliminação de dados desnecessários
-5. Portabilidade dos dados
-6. Eliminação dos dados tratados com consentimento
-7. Informação sobre compartilhamento
-8. Revogação do consentimento
-9. Revisão de decisões automatizadas
-10. Oposição ao tratamento realizado com base em legítimo interesse
-
-Estes direitos podem ser exercidos mediante requisição ao controlador dos dados.`,
-    category: 'Direitos',
-    date: '22/05/2023',
-    author: 'Equipe LGPD',
-    isFavorite: false
-  }
-};
-
-export default function ArticleScreen() {
+export default function ArticleDetail() {
   const { id } = useLocalSearchParams();
-  const article = mockArticleDetails[id as keyof typeof mockArticleDetails];
+  const db = useSQLiteContext();
+  const [article, setArticle] = useState<Article | null>(null);
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    const loadArticle = async () => {
+      const articleId = Number(id);
+      const loadedArticle = await DatabaseService.getArticleById(db, articleId);
+      setArticle(loadedArticle);
+
+      const saved = await DatabaseService.isArticleSaved(db, articleId);
+      setIsSaved(saved);
+    };
+
+    loadArticle();
+  }, [id]);
+
+  const handleToggleSave = async () => {
+    if (!article) return;
+
+    await DatabaseService.toggleFavorite(db, article.id);
+    setIsSaved(!isSaved);
+  };
 
   if (!article) {
     return (
-      <View style={styles.container}>
-        <Text>Artigo não encontrado</Text>
+      <View style={styles.loadingContainer}>
+        <Text style={styles.loadingText}>Carregando artigo...</Text>
       </View>
     );
   }
 
+  const categoryColors = getCategoryColorForCard(article.category);
+
   return (
     <ScrollView style={styles.container}>
-      <Stack.Screen
-        options={{
-          title: '',
-          headerRight: () => (
-            <TouchableOpacity style={{ marginRight: 16 }}>
-              <MaterialIcons
-                name={article.isFavorite ? "favorite" : "favorite-outline"}
-                size={24}
-                color={article.isFavorite ? "#FF3B30" : "#000"}
-              />
-            </TouchableOpacity>
-          )
-        }}
-      />
-
+      {/* Cabeçalho */}
       <View style={styles.header}>
-        <Text style={styles.category}>{article.category}</Text>
+        <View style={styles.categoryContainer}>
+          <View style={[styles.categoryBadge, { backgroundColor: categoryColors.bgColor }]}>
+            <Text style={[styles.categoryText, { color: categoryColors.textColor }]}>
+              {article.category}
+            </Text>
+          </View>
+          <SaveButton articleId={article.id} />
+        </View>
+
         <Text style={styles.title}>{article.title}</Text>
+
         <View style={styles.metaContainer}>
-          <Text style={styles.meta}>Publicado em {article.date}</Text>
-          <Text style={styles.meta}>•</Text>
-          <Text style={styles.meta}>{article.author}</Text>
+          <View style={styles.metaItem}>
+            <MaterialIcons name="calendar-today" size={16} color="#718096" />
+            <Text style={styles.metaText}>{article.date}</Text>
+          </View>
+          <View style={styles.metaItem}>
+            <MaterialIcons name="schedule" size={16} color="#718096" />
+            <Text style={styles.metaText}>{article.readingTime}</Text>
+          </View>
         </View>
       </View>
 
+      {/* Conteúdo */}
       <View style={styles.content}>
-        {article.content.split('\n\n').map((paragraph, index) => (
-          <Text key={index} style={
-            paragraph.startsWith('##') ? styles.subtitle : styles.text
-          }>
-            {paragraph.replace('##', '')}
-          </Text>
-        ))}
+        {article.summary && (
+          <>
+            <Text style={styles.subtitle}>Resumo</Text>
+            <Text style={styles.text}>{article.summary}</Text>
+          </>
+        )}
+
+        <Text style={styles.subtitle}>Conteúdo</Text>
+        <Text style={styles.text}>{article.content}</Text>
+
+        {article.tags && (
+          <>
+            <Text style={styles.subtitle}>Tags</Text>
+            <View style={styles.tagsContainer}>
+              {article.tags.split(',').map((tag, index) => (
+                <View key={index} style={styles.tag}>
+                  <Text style={styles.tagText}>{tag.trim()}</Text>
+                </View>
+              ))}
+            </View>
+          </>
+        )}
       </View>
 
-      <View style={styles.actions}>
+      {/* Rodapé */}
+      <View style={styles.footer}>
         <TouchableOpacity style={styles.actionButton}>
           <MaterialIcons name="share" size={20} color="#3182ce" />
           <Text style={styles.actionText}>Compartilhar</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.actionButton}>
-          <MaterialIcons name="bookmark" size={20} color="#3182ce" />
-          <Text style={styles.actionText}>Salvar</Text>
+          <MaterialIcons name="file-download" size={20} color="#3182ce" />
+          <Text style={styles.actionText}>Salvar PDF</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -114,71 +114,110 @@ export default function ArticleScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
     backgroundColor: '#fff',
   },
-  header: {
-    marginBottom: 24,
-    borderBottomWidth: 1,
-    borderBottomColor: '#eee',
-    paddingBottom: 16,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
   },
-  category: {
-    color: '#4299e1',
+  loadingText: {
+    fontSize: 16,
+    color: '#4a5568',
+  },
+  header: {
+    padding: 24,
+    paddingBottom: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#edf2f7',
+  },
+  categoryContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  categoryBadge: {
+    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  categoryText: {
+    fontSize: 12,
     fontWeight: '600',
-    marginBottom: 8,
     textTransform: 'uppercase',
-    fontSize: 14,
   },
   title: {
-    fontSize: 28,
-    fontWeight: '800',
+    fontSize: 24,
+    fontWeight: '700',
     color: '#1a365d',
-    marginBottom: 12,
+    marginBottom: 16,
     lineHeight: 32,
   },
   metaContainer: {
     flexDirection: 'row',
-    alignItems: 'center',
+    gap: 16,
   },
-  meta: {
-    color: '#718096',
+  metaItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  metaText: {
     fontSize: 14,
-    marginRight: 8,
+    color: '#718096',
   },
   content: {
-    marginBottom: 32,
+    padding: 24,
+    paddingTop: 16,
   },
   subtitle: {
-    fontSize: 20,
-    fontWeight: '700',
+    fontSize: 18,
+    fontWeight: '600',
     color: '#2d3748',
-    marginTop: 24,
-    marginBottom: 16,
+    marginTop: 8,
+    marginBottom: 12,
   },
   text: {
     fontSize: 16,
     lineHeight: 24,
-    color: '#2d3748',
+    color: '#4a5568',
+    marginBottom: 20,
+  },
+  tagsContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 8,
     marginBottom: 16,
   },
-  actions: {
+  tag: {
+    backgroundColor: '#ebf8ff',
+    borderRadius: 4,
+    paddingVertical: 4,
+    paddingHorizontal: 8,
+  },
+  tagText: {
+    fontSize: 14,
+    color: '#3182ce',
+  },
+  footer: {
     flexDirection: 'row',
     justifyContent: 'space-around',
-    marginTop: 16,
-    paddingTop: 16,
+    padding: 16,
     borderTopWidth: 1,
-    borderTopColor: '#eee',
+    borderTopColor: '#edf2f7',
+    marginTop: 8,
   },
   actionButton: {
     flexDirection: 'row',
     alignItems: 'center',
+    gap: 6,
     padding: 8,
-    marginBottom: 26
   },
   actionText: {
     color: '#3182ce',
-    marginLeft: 8,
     fontWeight: '500',
+    fontSize: 14,
   },
 });

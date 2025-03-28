@@ -1,6 +1,6 @@
 import { FlatList, StyleSheet } from 'react-native';
 import ArticleCard from '@/components/ArticleCard';
-import { Text } from 'react-native';
+import { View, Text } from 'react-native';
 
 const ArticleList = ({ articles }: { articles: typeof mockArticles }) => {
   if (articles.length === 0) {

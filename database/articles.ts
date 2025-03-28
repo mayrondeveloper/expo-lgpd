@@ -1,19 +1,5 @@
-// app/data/lgpdArticles.ts
-export interface Article {
-  id: number;
-  title: string;
-  summary: string;
-  content: string;
-  category: string;
-  date: string;
-  readingTime: string;
-  isFavorite: boolean;
-  tags?: string[];
-}
-
-const mockArticles: Article[] = [
+const initialArticles: Omit<Article, 'id'>[] = [
   {
-    id: 1,
     title: 'O que é a LGPD?',
     summary: 'Lei Geral de Proteção de Dados Pessoais no Brasil',
     content: `A Lei Geral de Proteção de Dados (LGPD), Lei nº 13.709/2018, regulamentada pelo Decreto nº 10.474/2020, estabelece normas sobre tratamento de dados pessoais.
@@ -32,10 +18,9 @@ A LGPD se aplica a:
     date: '10/01/2024',
     readingTime: '6 min',
     isFavorite: true,
-    tags: ['básico', 'conceitos']
+    tags: JSON.stringify(['básico', 'conceitos'])
   },
   {
-    id: 2,
     title: 'Sanções da LGPD em 2024',
     summary: 'Valores atualizados e critérios de aplicação',
     content: `## Tabela de multas (atualizada em 2024):
@@ -56,10 +41,9 @@ A LGPD se aplica a:
     date: '15/02/2024',
     readingTime: '7 min',
     isFavorite: false,
-    tags: ['multas', 'ANPD']
+    tags: JSON.stringify(['multas', 'ANPD'])
   },
   {
-    id: 3,
     title: 'Direitos dos Titulares (2024)',
     summary: 'Lista completa dos direitos garantidos',
     content: `## Direitos previstos no Art. 18:
@@ -81,10 +65,9 @@ A LGPD se aplica a:
     date: '05/03/2024',
     readingTime: '8 min',
     isFavorite: true,
-    tags: ['titulares', 'jurisprudência']
+    tags: JSON.stringify(['titulares', 'jurisprudência'])
   },
   {
-    id: 4,
     title: 'Dados Sensíveis - Tratamento',
     summary: 'Regras específicas para categorias especiais',
     content: `## Dados protegidos (Art. 11):
@@ -106,10 +89,9 @@ A LGPD se aplica a:
     date: '20/01/2024',
     readingTime: '6 min',
     isFavorite: false,
-    tags: ['saúde', 'biometria']
+    tags: JSON.stringify(['saúde', 'biometria'])
   },
   {
-    id: 5,
     title: 'Transferência Internacional de Dados',
     summary: 'Novas regras da ANPD (Resolução nº 5/2023)',
     content: `## Requisitos para transferência:
@@ -131,10 +113,9 @@ A LGPD se aplica a:
     date: '12/02/2024',
     readingTime: '5 min',
     isFavorite: true,
-    tags: ['transferência', 'ANPD']
+    tags: JSON.stringify(['transferência', 'ANPD'])
   },
   {
-    id: 6,
     title: 'As 10 Bases Legais da LGPD',
     summary: 'Quando o tratamento de dados é permitido sem consentimento',
     content: `## Bases legais previstas no Art. 7º:
@@ -157,10 +138,9 @@ A LGPD se aplica a:
     date: '18/03/2024',
     readingTime: '9 min',
     isFavorite: true,
-    tags: ['compliance', 'ANPD']
+    tags: JSON.stringify(['compliance', 'ANPD'])
   },
   {
-    id: 7,
     title: 'LGPD vs Marco Civil da Internet',
     summary: 'Como as leis se complementam na proteção digital',
     content: `## Pontos de intersecção:
@@ -180,10 +160,9 @@ A LGPD se aplica a:
     date: '22/02/2024',
     readingTime: '7 min',
     isFavorite: false,
-    tags: ['marco civil', 'internet']
+    tags: JSON.stringify(['marco civil', 'internet'])
   },
   {
-    id: 8,
     title: 'Proteção de Dados de Menores',
     summary: 'Regras especiais do Art. 14 da LGPD',
     content: `## Requisitos para tratamento:
@@ -202,10 +181,9 @@ A LGPD se aplica a:
     date: '05/01/2024',
     readingTime: '6 min',
     isFavorite: true,
-    tags: ['menores', 'escola']
+    tags: JSON.stringify(['menores', 'escola'])
   },
   {
-    id: 9,
     title: 'LGPD para PMEs',
     summary: 'Guia prático de implementação',
     content: `## Passos essenciais:
@@ -222,10 +200,9 @@ A LGPD se aplica a:
     date: '30/03/2024',
     readingTime: '8 min',
     isFavorite: false,
-    tags: ['pequenas empresas', 'guia']
+    tags: JSON.stringify(['pequenas empresas', 'guia'])
   },
   {
-    id: 10,
     title: 'Regras para Cookies na LGPD',
     summary: 'Conformidade em websites e apps',
     content: `## Novas diretrizes da ANPD:
@@ -245,10 +222,9 @@ A LGPD se aplica a:
     date: '14/02/2024',
     readingTime: '5 min',
     isFavorite: true,
-    tags: ['cookies', 'marketing']
+    tags: JSON.stringify(['cookies', 'marketing'])
   },
   {
-    id: 11,
     title: 'Como Exercer o Direito ao Esquecimento',
     summary: 'Limitações e procedimentos atualizados',
     content: `## Condições para requisição:
@@ -267,10 +243,9 @@ A LGPD se aplica a:
     date: '08/03/2024',
     readingTime: '6 min',
     isFavorite: false,
-    tags: ['esquecimento', 'jurisprudência']
+    tags: JSON.stringify(['esquecimento', 'jurisprudência'])
   },
   {
-    id: 12,
     title: 'Tratamento de Dados Médicos',
     summary: 'Especificidades do Art. 11º',
     content: `## Fluxo aprovado pela ANPD:
@@ -290,10 +265,9 @@ A LGPD se aplica a:
     date: '25/01/2024',
     readingTime: '7 min',
     isFavorite: true,
-    tags: ['saúde', 'dados sensíveis']
+    tags: JSON.stringify(['saúde', 'dados sensíveis'])
   },
   {
-    id: 13,
     title: 'Desafios da IA sob a LGPD',
     summary: 'Conformidade em sistemas automatizados',
     content: `## Requisitos para sistemas de IA:
@@ -312,10 +286,9 @@ A LGPD se aplica a:
     date: '19/03/2024',
     readingTime: '9 min',
     isFavorite: false,
-    tags: ['IA', 'algoritmos']
+    tags: JSON.stringify(['IA', 'algoritmos'])
   },
   {
-    id: 14,
     title: 'Processo Sancionatório da ANPD',
     summary: 'Etapas e defesa em casos de infração',
     content: `## Fluxo do processo:
@@ -336,10 +309,9 @@ A LGPD se aplica a:
     date: '11/02/2024',
     readingTime: '8 min',
     isFavorite: true,
-    tags: ['processo', 'defesa']
+    tags: JSON.stringify(['processo', 'defesa'])
   },
   {
-    id: 15,
     title: 'Cláusulas Contratuais para Transferência',
     summary: 'Modelos aprovados pela ANPD',
     content: `## Elementos obrigatórios:
@@ -361,26 +333,8 @@ A LGPD se aplica a:
     date: '28/02/2024',
     readingTime: '6 min',
     isFavorite: false,
-    tags: ['contratos', 'compliance']
+    tags: JSON.stringify(['contratos', 'compliance'])
   }
 ];
 
-// Utilitário para filtragem
-export const filterArticles = (options: {
-  category?: string;
-  searchQuery?: string;
-  onlyFavorites?: boolean;
-}) => {
-  return lgpdArticles.filter(article => {
-    const matchesCategory = !options.category || article.category === options.category;
-    const matchesFavorite = !options.onlyFavorites || article.isFavorite;
-    const matchesSearch = !options.searchQuery ||
-      `${article.title} ${article.content} ${article.tags?.join(' ')}`
-        .toLowerCase()
-        .includes(options.searchQuery.toLowerCase());
-
-    return matchesCategory && matchesFavorite && matchesSearch;
-  });
-};
-
-export default mockArticles;
+export default initialArticles;

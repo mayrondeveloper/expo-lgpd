@@ -44,11 +44,18 @@ export const DatabaseService = {
 
   async searchArticles(db: SQLiteDatabase, query: string): Promise<Article[]> {
     return await db.getAllAsync<Article>(
-      `SELECT id, title, summary, content, category, date, readingTime, isFavorite, tags
+      `SELECT id, title, summary, content, category
        FROM saved_articles
-       WHERE title LIKE ? OR content LIKE ? OR summary LIKE ? OR tags LIKE ?
-       ORDER BY date DESC`,
-      [`%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`]
+       WHERE title LIKE ? OR content LIKE ? OR summary LIKE ?
+       ORDER BY
+         CASE
+           WHEN title LIKE ? THEN 1
+           WHEN summary LIKE ? THEN 2
+           WHEN content LIKE ? THEN 3
+           ELSE 4
+         END
+       LIMIT 3`,
+      [`%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`, `%${query}%`]
     );
   },
 

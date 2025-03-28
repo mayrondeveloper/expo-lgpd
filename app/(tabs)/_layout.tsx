@@ -44,6 +44,15 @@ export default function TabLayout() {
           ),
         }}
       />
+      <Tabs.Screen
+              name="chat"
+              options={{
+                title: 'Assistente',
+                tabBarIcon: ({ color }) => (
+                  <MaterialIcons name="chat" size={24} color={color} />
+                ),
+              }}
+            />
     </Tabs>
   );
 }

@@ -1,50 +1,80 @@
-# Welcome to your Expo app 👋
+# LGPD Digital
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+Aplicativo móvel para consulta e estudo da Lei Geral de Proteção de Dados (LGPD), desenvolvido com o objetivo de facilitar o acesso às informações jurídicas e promover a aplicação prática dos conceitos estudados em sala de aula. O projeto integra teoria e prática, permitindo que profissionais e estudantes das áreas de Direito, TI e Administração encontrem de forma rápida e intuitiva os dispositivos da LGPD.
 
-## Get started
+## Sumário
 
-1. Install dependencies
+- [Recursos do Projeto](#recursos-do-projeto)
+- [Tecnologias Utilizadas](#tecnologias-utilizadas)
+- [Funcionalidades](#funcionalidades)
+- [Instalação e Configuração](#instalação-e-configuração)
+- [Uso](#uso)
+- [Colaboração](#colaboração)
+- [Licença](#licença)
+- [Evidências do Processo de Desenvolvimento](#evidências-do-processo-de-desenvolvimento)
 
-   ```bash
-   npm install
-   ```
+## Recursos do Projeto
 
-2. Start the app
+- **Consulta de Artigos da LGPD:** Permite buscar e visualizar artigos completos, resumos e informações relevantes.
+- **Busca Inteligente:** Pesquisa em título, resumo e conteúdo para facilitar o acesso às informações desejadas.
+- **Chat Assistente:** Sistema de chatbot que responde dúvidas técnicas relacionadas à LGPD.
+- **Sistema de Favoritos:** Possibilita salvar artigos para acesso rápido e posterior consulta.
+- **Organização por Categorias:** Classifica os artigos em diferentes seções, facilitando a navegação.
 
-   ```bash
-    npx expo start
-   ```
+## Tecnologias Utilizadas
 
-In the output, you'll find options to open the app in a
+- **React Native & Expo:** Desenvolvimento da interface móvel.
+- **SQLite:** Gerenciamento local dos dados e artigos.
+- **Componentes Reutilizáveis:** Estrutura modular para facilitar manutenção e escalabilidade.
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+## Funcionalidades
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+- **Consulta de Artigos:** Acesso aos artigos da LGPD com visualização detalhada.
+- **Busca por Termos:** Filtros por categorias e palavras-chave para facilitar a localização de informações.
+- **Chat Assistente:** Responde perguntas específicas sobre a LGPD, retornando resultados com base no conteúdo disponível.
+- **Gerenciamento de Favoritos:** Marcação e desmarcação de artigos para consulta posterior.
+- **Feedback e Atualizações:** Interface para receber feedback dos usuários e realizar melhorias contínuas.
 
-## Get a fresh project
+## Instalação e Configuração
 
-When you're ready, run:
+### Pré-requisitos
+
+- Node.js (LTS recomendado)
+- npm ou yarn
+- Expo CLI
+
+### Passos para Configuração
+
+1. **Clone o repositório:**
 
 ```bash
-npm run reset-project
+   git clone https://github.com/seu-usuario/lgpd-digital.git
+   cd lgpd-digital
+```
+## Instalação e Configuração
+
+**Instale as dependências:**
+
+```bash
+npm install
+# ou
+yarn install
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Uso
 
-## Learn more
+- Consulta de Artigos: Navegue pela tela principal para acessar os artigos da LGPD.
+- Busca Inteligente: Utilize a barra de pesquisa para filtrar artigos por termos ou categorias.
+- Chat Assistente: Faça perguntas diretamente no chat para obter respostas técnicas e orientações.
+- Favoritos: Marque os artigos de interesse clicando no ícone de favorito para acessar posteriormente.
 
-To learn more about developing your project with Expo, look at the following resources:
+### Colaboração
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+O projeto por enquanto não receberá contribuições. Somente depois a avaliação dos mestres.
 
-## Join the community
+### Licença
+Este projeto está licenciado sob a MIT License.
 
-Join our community of developers creating universal apps.
+### Evidências do Processo de Desenvolvimento
+Para comprovar a realização da atividade de extensão, o repositório inclui evidências do processo de desenvolvimento.
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
